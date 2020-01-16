@@ -15,11 +15,8 @@
 #include "mediapipe/framework/tool/subgraph_expansion.h"
 
 #include <algorithm>
-#include <functional>
-#include <map>
 #include <memory>
 #include <set>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -62,12 +59,9 @@ namespace tool {
     std::set<std::string>* result) {
   ASSIGN_OR_RETURN(auto src_map, tool::TagMap::Create(src_streams));
   ASSIGN_OR_RETURN(auto dst_map, tool::TagMap::Create(dst_streams));
-  for (auto id = src_map->BeginId(); id < src_map->EndId(); ++id) {
-    std::pair<std::string, int> tag_index = src_map->TagAndIndexFromId(id);
-    if (!dst_map->GetId(tag_index.first, tag_index.second).IsValid()) {
-      result->insert(src_map->Names()[id.value()]);
-    }
-  }
+  std::set_difference(src_map->Names().begin(), src_map->Names().end(),
+                      dst_map->Names().begin(), dst_map->Names().end(),
+                      std::inserter(*result, result->begin()));
   return ::mediapipe::OkStatus();
 }
 
@@ -75,10 +69,8 @@ namespace tool {
 ::mediapipe::Status RemoveIgnoredStreams(
     proto_ns::RepeatedPtrField<ProtoString>* streams,
     const std::set<std::string>& missing_streams) {
-  ASSIGN_OR_RETURN(auto src_map, tool::TagMap::Create(*streams));
-  std::vector<std::string> src_names = src_map->Names();
   for (int i = streams->size() - 1; i >= 0; --i) {
-    if (missing_streams.count(src_names[i]) > 0) {
+    if (missing_streams.count(streams->Get(i)) > 0) {
       streams->DeleteSubrange(i, 1);
     }
   }

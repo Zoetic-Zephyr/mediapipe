@@ -39,11 +39,6 @@ pipeline.
 the same TFLite model in a CPU-based pipeline. This example highlights how
 graphs can be easily adapted to run on CPU v.s. GPU.
 
-### Object Detection and Tracking with GPU
-
-[Object Detection and Tracking with GPU](./object_tracking_mobile_gpu.md) illustrates how to
-use MediaPipe for object detection and tracking.
-
 ### Face Detection with GPU
 
 [Face Detection with GPU](./face_detection_mobile_gpu.md) illustrates how to use
@@ -108,9 +103,9 @@ and model details are described in the
 [Hello World for C++](./hello_world_desktop.md) shows how to run a simple graph
 using the MediaPipe C++ APIs.
 
-### Feature Extraction and Model Inference for YouTube-8M Challenge
+### Feature Extration for YouTube-8M Challenge
 
-[Feature Extraction and Model Inference for YouTube-8M Challenge](./youtube_8m.md)
+[Feature Extration and Model Inference for YouTube-8M Challenge](./youtube_8m.md)
 shows how to use MediaPipe to prepare training data for the YouTube-8M Challenge
 and do the model inference with the baseline model.
 
@@ -119,11 +114,6 @@ and do the model inference with the baseline model.
 [Preparing Data Sets with MediaSequence](./media_sequence.md) shows how to use
 MediaPipe for media processing to prepare video data sets for training a
 TensorFlow model.
-
-### Automatic video cropping
-
-[AutoFlip](./autoflip.md) shows how to use MediaPipe to build an automatic video
-cropping pipeline that can convert an input video to arbitrary aspect ratios.
 
 ### Object Detection on Desktop
 
@@ -167,20 +157,3 @@ how to use MediaPipe with a TFLite model for hair segmentation on desktop using
 GPU with live video from a webcam.
 
 *   [Desktop GPU](./hair_segmentation_desktop.md)
-
-## Google Coral (machine learning acceleration with Google EdgeTPU)
-
-Below are code samples on how to run MediaPipe on Google Coral Dev Board.
-
-### Object Detection on Coral
-
-[Object Detection on Coral with Webcam](./object_detection_coral_devboard.md)
-shows how to run quantized object detection TFlite model accelerated with
-EdgeTPU on
-[Google Coral Dev Board](https://coral.withgoogle.com/products/dev-board).
-
-### Face Detection on Coral
-
-[Face Detection on Coral with Webcam](./face_detection_coral_devboard.md) shows
-how to use quantized face detection TFlite model accelerated with EdgeTPU on
-[Google Coral Dev Board](https://coral.withgoogle.com/products/dev-board).

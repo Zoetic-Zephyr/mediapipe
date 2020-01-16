@@ -80,9 +80,7 @@ mediapipe_cc_proto_library(
     name = "opencv_image_encoder_calculator_cc_proto",
     srcs = ["opencv_image_encoder_calculator.proto"],
     cc_deps = ["//mediapipe/framework:calculator_cc_proto"],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//visibility:public"],
     deps = [":opencv_image_encoder_calculator_proto"],
 )
 
@@ -358,13 +356,13 @@ cc_library(
         "//mediapipe/framework/port:opencv_imgproc",
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
+        "//mediapipe/gpu:gpu_buffer",
     ] + select({
         "//mediapipe/gpu:disable_gpu": [],
         "//conditions:default": [
             "//mediapipe/gpu:gl_calculator_helper",
             "//mediapipe/gpu:gl_simple_shaders",
             "//mediapipe/gpu:gl_quad_renderer",
-            "//mediapipe/gpu:gpu_buffer",
             "//mediapipe/gpu:shader_util",
         ],
     }),

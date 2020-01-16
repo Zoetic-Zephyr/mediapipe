@@ -135,7 +135,7 @@ class TensorFlowSessionFromSavedModelGenerator : public PacketGenerator {
     if (!status.ok()) {
       return ::mediapipe::Status(
           static_cast<::mediapipe::StatusCode>(status.code()),
-          status.ToString());
+          status.error_message());
     }
 
     auto session = absl::make_unique<TensorFlowSession>();

@@ -46,13 +46,12 @@ inline float Remap(float x, float lo, float hi, float scale) {
   return (x - lo) / (hi - lo + 1e-6) * scale;
 }
 
-template <class LandmarkListType, class LandmarkType>
-inline void GetMinMaxZ(const LandmarkListType& landmarks, float* z_min,
+template <class LandmarkType>
+inline void GetMinMaxZ(const std::vector<LandmarkType>& landmarks, float* z_min,
                        float* z_max) {
   *z_min = std::numeric_limits<float>::max();
   *z_max = std::numeric_limits<float>::min();
-  for (int i = 0; i < landmarks.landmark_size(); ++i) {
-    const LandmarkType& landmark = landmarks.landmark(i);
+  for (const auto& landmark : landmarks) {
     *z_min = std::min(landmark.z(), *z_min);
     *z_max = std::max(landmark.z(), *z_max);
   }
@@ -74,7 +73,7 @@ void SetColorSizeValueFromZ(float z, float z_min, float z_max,
 }  // namespace
 
 // A calculator that converts Landmark proto to RenderData proto for
-// visualization. The input should be LandmarkList proto. It is also possible
+// visualization. The input should be std::vector<Landmark>. It is also possible
 // to specify the connections between landmarks.
 //
 // Example config:
@@ -122,11 +121,11 @@ class LandmarksToRenderDataCalculator : public CalculatorBase {
       const LandmarksToRenderDataCalculatorOptions& options, bool normalized,
       int gray_val1, int gray_val2, RenderData* render_data);
 
-  template <class LandmarkListType>
-  void AddConnections(const LandmarkListType& landmarks, bool normalized,
-                      RenderData* render_data);
-  template <class LandmarkListType>
-  void AddConnectionsWithDepth(const LandmarkListType& landmarks,
+  template <class LandmarkType>
+  void AddConnections(const std::vector<LandmarkType>& landmarks,
+                      bool normalized, RenderData* render_data);
+  template <class LandmarkType>
+  void AddConnectionsWithDepth(const std::vector<LandmarkType>& landmarks,
                                bool normalized, float min_z, float max_z,
                                RenderData* render_data);
 
@@ -145,10 +144,10 @@ REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);
          "normalized landmarks.";
 
   if (cc->Inputs().HasTag(kLandmarksTag)) {
-    cc->Inputs().Tag(kLandmarksTag).Set<LandmarkList>();
+    cc->Inputs().Tag(kLandmarksTag).Set<std::vector<Landmark>>();
   }
   if (cc->Inputs().HasTag(kNormLandmarksTag)) {
-    cc->Inputs().Tag(kNormLandmarksTag).Set<NormalizedLandmarkList>();
+    cc->Inputs().Tag(kNormLandmarksTag).Set<std::vector<NormalizedLandmark>>();
   }
   cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
   return ::mediapipe::OkStatus();
@@ -170,17 +169,16 @@ REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);
   float z_max = 0.f;
 
   if (cc->Inputs().HasTag(kLandmarksTag)) {
-    const LandmarkList& landmarks =
-        cc->Inputs().Tag(kLandmarksTag).Get<LandmarkList>();
+    const auto& landmarks =
+        cc->Inputs().Tag(kLandmarksTag).Get<std::vector<Landmark>>();
     RET_CHECK_EQ(options_.landmark_connections_size() % 2, 0)
         << "Number of entries in landmark connections must be a multiple of 2";
     if (visualize_depth) {
-      GetMinMaxZ<LandmarkList, Landmark>(landmarks, &z_min, &z_max);
+      GetMinMaxZ(landmarks, &z_min, &z_max);
     }
     // Only change rendering if there are actually z values other than 0.
     visualize_depth &= ((z_max - z_min) > 1e-3);
-    for (int i = 0; i < landmarks.landmark_size(); ++i) {
-      const Landmark& landmark = landmarks.landmark(i);
+    for (const auto& landmark : landmarks) {
       auto* landmark_data_render =
           AddPointRenderData(options_, render_data.get());
       if (visualize_depth) {
@@ -193,27 +191,25 @@ REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);
       landmark_data->set_y(landmark.y());
     }
     if (visualize_depth) {
-      AddConnectionsWithDepth<LandmarkList>(landmarks, /*normalized=*/false,
-                                            z_min, z_max, render_data.get());
+      AddConnectionsWithDepth(landmarks, /*normalized=*/false, z_min, z_max,
+                              render_data.get());
     } else {
-      AddConnections<LandmarkList>(landmarks, /*normalized=*/false,
-                                   render_data.get());
+      AddConnections(landmarks, /*normalized=*/false, render_data.get());
     }
   }
 
   if (cc->Inputs().HasTag(kNormLandmarksTag)) {
-    const NormalizedLandmarkList& landmarks =
-        cc->Inputs().Tag(kNormLandmarksTag).Get<NormalizedLandmarkList>();
+    const auto& landmarks = cc->Inputs()
+                                .Tag(kNormLandmarksTag)
+                                .Get<std::vector<NormalizedLandmark>>();
     RET_CHECK_EQ(options_.landmark_connections_size() % 2, 0)
         << "Number of entries in landmark connections must be a multiple of 2";
     if (visualize_depth) {
-      GetMinMaxZ<NormalizedLandmarkList, NormalizedLandmark>(landmarks, &z_min,
-                                                             &z_max);
+      GetMinMaxZ(landmarks, &z_min, &z_max);
     }
     // Only change rendering if there are actually z values other than 0.
     visualize_depth &= ((z_max - z_min) > 1e-3);
-    for (int i = 0; i < landmarks.landmark_size(); ++i) {
-      const NormalizedLandmark& landmark = landmarks.landmark(i);
+    for (const auto& landmark : landmarks) {
       auto* landmark_data_render =
           AddPointRenderData(options_, render_data.get());
       if (visualize_depth) {
@@ -226,11 +222,10 @@ REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);
       landmark_data->set_y(landmark.y());
     }
     if (visualize_depth) {
-      AddConnectionsWithDepth<NormalizedLandmarkList>(
-          landmarks, /*normalized=*/true, z_min, z_max, render_data.get());
+      AddConnectionsWithDepth(landmarks, /*normalized=*/true, z_min, z_max,
+                              render_data.get());
     } else {
-      AddConnections<NormalizedLandmarkList>(landmarks, /*normalized=*/true,
-                                             render_data.get());
+      AddConnections(landmarks, /*normalized=*/true, render_data.get());
     }
   }
 
@@ -240,13 +235,13 @@ REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);
   return ::mediapipe::OkStatus();
 }
 
-template <class LandmarkListType>
+template <class LandmarkType>
 void LandmarksToRenderDataCalculator::AddConnectionsWithDepth(
-    const LandmarkListType& landmarks, bool normalized, float min_z,
+    const std::vector<LandmarkType>& landmarks, bool normalized, float min_z,
     float max_z, RenderData* render_data) {
   for (int i = 0; i < options_.landmark_connections_size(); i += 2) {
-    const auto& ld0 = landmarks.landmark(options_.landmark_connections(i));
-    const auto& ld1 = landmarks.landmark(options_.landmark_connections(i + 1));
+    const auto& ld0 = landmarks[options_.landmark_connections(i)];
+    const auto& ld1 = landmarks[options_.landmark_connections(i + 1)];
     const int gray_val1 =
         255 - static_cast<int>(Remap(ld0.z(), min_z, max_z, 255));
     const int gray_val2 =
@@ -277,13 +272,13 @@ void LandmarksToRenderDataCalculator::AddConnectionToRenderData(
   connection_annotation->set_thickness(options.thickness());
 }
 
-template <class LandmarkListType>
+template <class LandmarkType>
 void LandmarksToRenderDataCalculator::AddConnections(
-    const LandmarkListType& landmarks, bool normalized,
+    const std::vector<LandmarkType>& landmarks, bool normalized,
     RenderData* render_data) {
   for (int i = 0; i < options_.landmark_connections_size(); i += 2) {
-    const auto& ld0 = landmarks.landmark(options_.landmark_connections(i));
-    const auto& ld1 = landmarks.landmark(options_.landmark_connections(i + 1));
+    const auto& ld0 = landmarks[options_.landmark_connections(i)];
+    const auto& ld1 = landmarks[options_.landmark_connections(i + 1)];
     AddConnectionToRenderData(ld0.x(), ld0.y(), ld1.x(), ld1.y(), options_,
                               normalized, render_data);
   }

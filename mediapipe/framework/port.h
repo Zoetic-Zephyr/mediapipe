@@ -37,16 +37,12 @@
 #if !defined(MEDIAPIPE_IOS) && !TARGET_OS_OSX
 #define MEDIAPIPE_IOS
 #endif
-#if !defined(MEDIAPIPE_OSX) && TARGET_OS_OSX
-#define MEDIAPIPE_OSX
-#endif
 #endif
 
 // These platforms do not support OpenGL ES Compute Shaders (v3.1 and up),
-// but may or may not still be able to run other OpenGL code.
-#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE) &&         \
-    (defined(__APPLE__) || defined(__EMSCRIPTEN__) || \
-     defined(MEDIAPIPE_DISABLE_GPU))
+// but can still run OpenGL ES 3.0 and below.
+#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE) && \
+    (defined(__APPLE__) || defined(__EMSCRIPTEN__))
 #define MEDIAPIPE_DISABLE_GL_COMPUTE
 #endif
 

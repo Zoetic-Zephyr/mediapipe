@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mediapipe/calculators/core/packet_resampler_calculator.h"
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,6 +29,7 @@
 namespace mediapipe {
 
 namespace {
+
 // A simple version of CalculatorRunner with built-in convenience
 // methods for setting inputs from a vector and checking outputs
 // against expected outputs (both timestamps and contents).

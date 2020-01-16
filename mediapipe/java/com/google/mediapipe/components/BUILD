@@ -60,9 +60,6 @@ android_library(
 android_library(
     name = "android_microphone_helper",
     srcs = [
-        "AudioDataConsumer.java",
-        "AudioDataProcessor.java",
-        "AudioDataProducer.java",
         "MicrophoneHelper.java",
     ],
     visibility = ["//visibility:public"],

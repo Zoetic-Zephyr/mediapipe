@@ -16,7 +16,6 @@
 
 #include <dirent.h>
 #include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
 
 #include <cerrno>
@@ -58,11 +57,10 @@ namespace file {
   }
 
   fwrite(content.data(), sizeof(char), content.size(), fp);
-  size_t write_error = ferror(fp);
-  if (fclose(fp) != 0 || write_error) {
+  size_t ret = fclose(fp);
+  if (ret == 0 && ferror(fp)) {
     return ::mediapipe::InternalErrorBuilder(MEDIAPIPE_LOC)
-           << "Error while writing file: " << file_name
-           << ". Error message: " << strerror(write_error);
+           << "Error while writing file: " << file_name;
   }
   return ::mediapipe::OkStatus();
 }

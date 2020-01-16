@@ -17,22 +17,18 @@ package com.google.mediapipe.apps.objectdetectiongpu;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.mediapipe.formats.proto.DetectionProto.Detection;
 import com.google.mediapipe.components.CameraHelper;
 import com.google.mediapipe.components.CameraXPreviewHelper;
 import com.google.mediapipe.components.ExternalTextureConverter;
 import com.google.mediapipe.components.FrameProcessor;
 import com.google.mediapipe.components.PermissionHelper;
 import com.google.mediapipe.framework.AndroidAssetUtil;
-import com.google.mediapipe.framework.PacketGetter;
 import com.google.mediapipe.glutil.EglManager;
-import java.util.List;
 
 /** Main activity of MediaPipe example apps. */
 public class MainActivity extends AppCompatActivity {
@@ -41,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
   private static final String BINARY_GRAPH_NAME = "objectdetectiongpu.binarypb";
   private static final String INPUT_VIDEO_STREAM_NAME = "input_video";
   private static final String OUTPUT_VIDEO_STREAM_NAME = "output_video";
-  private static final String OUTPUT_DETECTIONS_STREAM_NAME = "output_detections";
   private static final CameraHelper.CameraFacing CAMERA_FACING = CameraHelper.CameraFacing.BACK;
 
   // Flips the camera-preview frames vertically before sending them into FrameProcessor to be
@@ -53,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
   static {
     // Load all native libraries needed by the app.
     System.loadLibrary("mediapipe_jni");
-    System.loadLibrary("opencv_java3");
+    System.loadLibrary("opencv_java4");
   }
 
   // {@link SurfaceTexture} where the camera-preview frames can be accessed.
@@ -94,14 +89,6 @@ public class MainActivity extends AppCompatActivity {
             INPUT_VIDEO_STREAM_NAME,
             OUTPUT_VIDEO_STREAM_NAME);
     processor.getVideoSurfaceOutput().setFlipY(FLIP_FRAMES_VERTICALLY);
-
-    processor.addPacketCallback(
-        OUTPUT_DETECTIONS_STREAM_NAME,
-        (packet) -> {
-          Log.d(TAG, "Received detections packet.");
-          List<Detection> detections = PacketGetter.getProtoVector(packet, Detection.parser());
-          Log.d(TAG, "[TS:" + packet.getTimestamp() + "] " + getDetectionsDebugString(detections));
-        });
 
     PermissionHelper.checkAndRequestCameraPermissions(this);
   }
@@ -176,23 +163,5 @@ public class MainActivity extends AppCompatActivity {
           previewDisplayView.setVisibility(View.VISIBLE);
         });
     cameraHelper.startCamera(this, CAMERA_FACING, /*surfaceTexture=*/ null);
-  }
-
-  private static String getDetectionsDebugString(List<Detection> detections) {
-    if (detections.isEmpty()) {
-      return "No detections";
-    }
-    String detectionsStr = "Number of objects detected: " + detections.size() + "\n";
-    int objectIndex = 0;
-    for (Detection detection : detections) {
-      detectionsStr += "\t#Object[" + objectIndex + "]: \n";
-      List<String> labels = detection.getLabelList();
-      List<Float> scores = detection.getScoreList();
-      for (int i = 0; i < labels.size(); ++i) {
-        detectionsStr += "\t\tLabel [" + i + "]: " + labels.get(i) + ", " + scores.get(i) + "\n";
-      }
-      ++objectIndex;
-    }
-    return detectionsStr;
   }
 }

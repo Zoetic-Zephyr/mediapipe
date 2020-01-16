@@ -51,6 +51,25 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "demo_run_graph_main_out",
+    srcs = ["demo_run_graph_main_out.cc"],
+    deps = [
+        "//mediapipe/calculators/util:landmarks_to_render_data_calculator",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        "//mediapipe/framework/port:commandlineflags",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+    ],
+)
+
 # Linux only.
 # Must have a GPU with EGL support:
 # ex: sudo aptitude install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev

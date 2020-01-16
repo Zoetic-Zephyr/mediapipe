@@ -15,7 +15,6 @@
 // A simple main function to run a MediaPipe graph. Input side packets are read
 // from files provided via the command line and output side packets are written
 // to disk.
-#include <cstdlib>
 
 #include "absl/strings/str_split.h"
 #include "mediapipe/framework/calculator_framework.h"
@@ -88,9 +87,8 @@ int main(int argc, char** argv) {
   ::mediapipe::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
     LOG(ERROR) << "Failed to run the graph: " << run_status.message();
-    return EXIT_FAILURE;
   } else {
     LOG(INFO) << "Success!";
   }
-  return EXIT_SUCCESS;
+  return 0;
 }

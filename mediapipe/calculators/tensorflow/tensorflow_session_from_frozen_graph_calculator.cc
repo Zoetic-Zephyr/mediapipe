@@ -31,7 +31,8 @@
 #include "mediapipe/framework/tool/status_util.h"
 #include "tensorflow/core/public/session_options.h"
 
-#if defined(MEDIAPIPE_MOBILE)
+#if defined(MEDIAPIPE_LITE) || defined(__ANDROID__) || \
+    defined(__APPLE__) && !TARGET_OS_OSX
 #include "mediapipe/util/android/file/base/helpers.h"
 #else
 #include "mediapipe/framework/port/file_helpers.h"
@@ -109,7 +110,7 @@ class TensorFlowSessionFromFrozenGraphCalculator : public CalculatorBase {
 
     RET_CHECK(graph_def.ParseFromString(graph_def_serialized));
     const tf::Status tf_status = session->session->Create(graph_def);
-    RET_CHECK(tf_status.ok()) << "Create failed: " << tf_status.ToString();
+    RET_CHECK(tf_status.ok()) << "Create failed: " << tf_status.error_message();
 
     for (const auto& key_value : options.tag_to_tensor_names()) {
       session->tag_to_tensor_map[key_value.first] = key_value.second;
@@ -119,7 +120,7 @@ class TensorFlowSessionFromFrozenGraphCalculator : public CalculatorBase {
           session->session->Run({}, {}, initialization_op_names, {});
       // RET_CHECK on the tf::Status object itself in order to print an
       // informative error message.
-      RET_CHECK(tf_status.ok()) << "Run failed: " << tf_status.ToString();
+      RET_CHECK(tf_status.ok()) << "Run failed: " << tf_status.error_message();
     }
 
     cc->OutputSidePackets().Tag("SESSION").Set(Adopt(session.release()));

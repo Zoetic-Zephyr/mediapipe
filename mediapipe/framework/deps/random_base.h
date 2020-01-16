@@ -22,7 +22,6 @@ class RandomBase {
   virtual ~RandomBase();
 
   virtual float RandFloat() { return 0; }
-  virtual int UnbiasedUniform(int n) { return n - 1; }
 };
 
 #endif  // MEDIAPIPE_DEPS_RANDOM_BASE_H_

@@ -21,9 +21,15 @@ import android.media.MediaRecorder.AudioSource;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.util.Log;
+import javax.annotation.Nullable;
 
 /** Provides access to audio data from a microphone. */
-public class MicrophoneHelper implements AudioDataProducer {
+public class MicrophoneHelper {
+  /** The listener is called when audio data from the microphone is available. */
+  public interface OnAudioDataAvailableListener {
+    public void onAudioDataAvailable(byte[] audioData, long timestampMicros);
+  }
+
   private static final String TAG = "MicrophoneHelper";
 
   private static final int AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -74,7 +80,6 @@ public class MicrophoneHelper implements AudioDataProducer {
   // AudioRecord is used to setup a way to record data from the audio source. See
   // https://developer.android.com/reference/android/media/AudioRecord.htm for details.
   private AudioRecord audioRecord;
-  private AudioFormat audioFormat;
   // Data is read on a separate non-blocking thread.
   private Thread recordingThread;
 
@@ -82,10 +87,10 @@ public class MicrophoneHelper implements AudioDataProducer {
   // sent to the listener of this class.
   private boolean recording = false;
 
-  // The consumer is provided with the data read on every AudioRecord.read() call. If the consumer
+  // This listener is provided with the data read on every AudioRecord.read() call. If the listener
   // called stopRecording() while a call to AudioRecord.read() was blocked, the class will discard
   // the data read after recording stopped.
-  private AudioDataConsumer consumer;
+  private OnAudioDataAvailableListener onAudioDataAvailableListener;
 
   /**
    * MicrophoneHelper class constructor. Arugments:
@@ -125,18 +130,18 @@ public class MicrophoneHelper implements AudioDataProducer {
     audioData = new byte[bufferSize];
 
     Log.d(TAG, "AudioRecord(" + sampleRateInHz + ", " + bufferSize + ")");
-    audioFormat =
-        new AudioFormat.Builder()
-            .setEncoding(AUDIO_ENCODING)
-            .setSampleRate(sampleRateInHz)
-            .setChannelMask(channelConfig)
-            .build();
     audioRecord =
         new AudioRecord.Builder()
             .setAudioSource(AUDIO_SOURCE)
-            .setAudioFormat(audioFormat)
+            .setAudioFormat(
+                new AudioFormat.Builder()
+                    .setEncoding(AUDIO_ENCODING)
+                    .setSampleRate(sampleRateInHz)
+                    .setChannelMask(channelConfig)
+                    .build())
             .setBufferSizeInBytes(bufferSize)
             .build();
+
     if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
       audioRecord.release();
       Log.e(TAG, "AudioRecord could not open.");
@@ -147,12 +152,12 @@ public class MicrophoneHelper implements AudioDataProducer {
         new Thread(
             () -> {
               android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+              Log.v(TAG, "Running audio recording thread.");
 
               // Initial timestamp in case the AudioRecord.getTimestamp() function is unavailable.
-              long startTimestamp =
-                  initialTimestamp != UNINITIALIZED_TIMESTAMP
-                      ? initialTimestamp
-                      : System.nanoTime() / NANOS_PER_MICROS;
+              long startTimestamp = initialTimestamp != UNINITIALIZED_TIMESTAMP
+                  ? initialTimestamp
+                  : System.nanoTime() / NANOS_PER_MICROS;
               long sampleBasedTimestamp;
               while (recording) {
                 if (audioRecord == null) {
@@ -165,7 +170,7 @@ public class MicrophoneHelper implements AudioDataProducer {
                 long sampleBasedFallbackTimestamp =
                     startTimestamp + totalNumSamplesRead * MICROS_PER_SECOND / sampleRateInHz;
                 sampleBasedTimestamp =
-                    getTimestamp(/*fallbackTimestamp=*/ sampleBasedFallbackTimestamp);
+                    getTimestamp(/*fallbackTimestamp=*/sampleBasedFallbackTimestamp);
                 if (numBytesRead <= 0) {
                   if (numBytesRead == AudioRecord.ERROR_INVALID_OPERATION) {
                     Log.e(TAG, "ERROR_INVALID_OPERATION");
@@ -174,13 +179,14 @@ public class MicrophoneHelper implements AudioDataProducer {
                   }
                   continue;
                 }
+                Log.v(TAG, "Read " + numBytesRead + " bytes of audio data.");
 
-                // Confirm that the consumer is still interested in receiving audio data and
-                // stopMicrophone() wasn't called. If the consumer called stopMicrophone(), discard
+                // Confirm that the listener is still interested in receiving audio data and
+                // stopMicrophone() wasn't called. If the listener called stopMicrophone(), discard
                 // the data read in the latest AudioRecord.read(...) function call.
-                if (recording && consumer != null) {
-                  // TODO: Refactor audioData buffer cloning.
-                  consumer.onNewAudioData(audioData.clone(), sampleBasedTimestamp, audioFormat);
+                if (recording) {
+                  onAudioDataAvailableListener.onAudioDataAvailable(
+                      audioData.clone(), sampleBasedTimestamp);
                 }
 
                 // TODO: Replace byte[] with short[] audioData.
@@ -283,8 +289,7 @@ public class MicrophoneHelper implements AudioDataProducer {
     audioRecord.release();
   }
 
-  @Override
-  public void setAudioConsumer(AudioDataConsumer consumer) {
-    this.consumer = consumer;
+  public void setOnAudioDataAvailableListener(@Nullable OnAudioDataAvailableListener listener) {
+    onAudioDataAvailableListener = listener;
   }
 }

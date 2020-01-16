@@ -24,7 +24,8 @@
 #include "mediapipe/framework/port/ret_check.h"
 #include "mediapipe/util/resource_util.h"
 #include "tensorflow/lite/interpreter.h"
-#if defined(MEDIAPIPE_MOBILE)
+#if defined(__EMSCRIPTEN__) || defined(__ANDROID__) || \
+    (defined(__APPLE__) && !TARGET_OS_OSX)
 #include "mediapipe/util/android/file/base/file.h"
 #include "mediapipe/util/android/file/base/helpers.h"
 #else

@@ -7,9 +7,8 @@ future.
 Note: If you plan to use TensorFlow calculators and example apps, there is a
 known issue with gcc and g++ version 6.3 and 7.3. Please use other versions.
 
-Note: To make Mediapipe work with TensorFlow, please set Python 3.7 as the
-default Python version and install the Python "six" library by running `pip3
-install --user six`.
+Note: To make Mediapipe work with TensorFlow, please install the python "future"
+library and the python "six" library using `pip install --user future six`.
 
 Choose your operating system:
 
@@ -40,12 +39,19 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-2.  Install Bazel (version between 0.24.1 and 1.2.1).
+2.  Install Bazel (0.24.1 and above required).
 
-    Follow the official
+    Option 1. Use package manager tool to install the latest version of Bazel.
+
+    ```bash
+    $ sudo apt-get install bazel
+
+    # Run 'bazel version' to check version of bazel installed
+    ```
+
+    Option 2. Follow the official
     [Bazel documentation](https://docs.bazel.build/versions/master/install-ubuntu.html)
-    to install Bazel manually. Note that MediaPipe doesn't support Bazel 2.0.0+
-    yet.
+    to install any version of Bazel manually.
 
 3.  Install OpenCV and FFmpeg.
 
@@ -57,7 +63,6 @@ To build and run iOS apps:
 
     ```bash
     $ sudo apt-get install libopencv-core-dev libopencv-highgui-dev \
-                           libopencv-calib3d-dev libopencv-features2d-dev \
                            libopencv-imgproc-dev libopencv-video-dev
     ```
 
@@ -152,12 +157,11 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-2.  Install Bazel (version between 0.24.1 and 1.2.1).
+2.  Install Bazel (0.24.1 and above required).
 
     Follow the official
     [Bazel documentation](https://docs.bazel.build/versions/master/install-redhat.html)
-    to install Bazel manually. Note that MediaPipe doesn't support Bazel 2.0.0+
-    yet.
+    to install Bazel manually.
 
 3.  Install OpenCV.
 
@@ -241,23 +245,19 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-3.  Install Bazel (version between 0.24.1 and 1.1.0).
+3.  Install Bazel (0.24.1 and above required).
 
-    Option 1. Use package manager tool to install Bazel 1.1.0
+    Option 1. Use package manager tool to install the latest version of Bazel.
 
     ```bash
-    # If Bazel 1.1.0+ was installed.
-    $ brew uninstall bazel
-    # Install Bazel 1.1.0
-    $ brew install https://raw.githubusercontent.com/bazelbuild/homebrew-tap/f8a0fa981bcb1784a0d0823e14867b844e94fb3d/Formula/bazel.rb
-    $ brew link bazel
-    # Run 'bazel version' to check version of bazel
+    $ brew install bazel
+
+    # Run 'bazel version' to check version of bazel installed
     ```
 
     Option 2. Follow the official
     [Bazel documentation](https://docs.bazel.build/versions/master/install-os-x.html#install-with-installer-mac-os-x)
-    to install any version of Bazel manually. Note that MediaPipe doesn't
-    support Bazel 1.1.0+ on macOS yet.
+    to install any version of Bazel manually.
 
 4.  Install OpenCV and FFmpeg.
 
@@ -266,10 +266,12 @@ To build and run iOS apps:
 
     ```bash
     $ brew install opencv@3
-
-    # There is a known issue caused by the glog dependency. Uninstall glog.
-    $ brew uninstall --ignore-dependencies glog
     ```
+
+    Note: If you do `$brew install opencv`, there is a known issue caused by the
+    glog dependency of OpenCV 4.1.1 or above. The problem is solvable by
+    uninstalling the glog. You need to do `$ brew uninstall
+    --ignore-dependencies glog`
 
     Option 2. Use MacPorts package manager tool to install the OpenCV libraries.
 
@@ -331,17 +333,7 @@ To build and run iOS apps:
 
     ```
 
-5.  Make sure that Python 3 and Python "six" library is installed.
-
-    ```
-    $ brew install python
-    $ sudo ln -s -f /usr/local/bin/python3.7 /usr/local/bin/python
-    $ python --version
-    Python 3.7.4
-    $ pip3 install --user six
-    ```
-
-6.  Run the [Hello World desktop example](./hello_world_desktop.md).
+5.  Run the [Hello World desktop example](./hello_world_desktop.md).
 
     ```bash
     $ export GLOG_logtostderr=1
@@ -364,9 +356,6 @@ To build and run iOS apps:
 
 ### Installing on Windows Subsystem for Linux (WSL)
 
-Note: WSL has historically not provided access to USB cameras. Mediapipe can use
-a video file as input.
-
 1.  Follow the
     [instruction](https://docs.microsoft.com/en-us/windows/wsl/install-win10) to
     install Windows Sysystem for Linux (Ubuntu).
@@ -386,10 +375,10 @@ a video file as input.
 4.  Install the needed packages.
 
     ```bash
-    username@DESKTOP-TMVLBJ1:~$ sudo apt-get update && sudo apt-get install -y build-essential git python zip adb openjdk-8-jdk
+    username@DESKTOP-TMVLBJ1:~$ sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential git python zip adb openjdk-8-jdk
     ```
 
-5.  Install Bazel (version between 0.24.1 and 1.2.1).
+5.  Install Bazel (0.24.1 and above required).
 
     ```bash
     username@DESKTOP-TMVLBJ1:~$ curl -sLO --retry 5 --retry-max-time 10 \
@@ -418,7 +407,6 @@ a video file as input.
 
     ```bash
     username@DESKTOP-TMVLBJ1:~/mediapipe$ sudo apt-get install libopencv-core-dev libopencv-highgui-dev \
-                           libopencv-calib3d-dev libopencv-features2d-dev \
                            libopencv-imgproc-dev libopencv-video-dev
     ```
 
@@ -538,7 +526,7 @@ This will use a Docker image that will isolate mediapipe's installation from the
     ```bash
     $ docker run -it --name mediapipe mediapipe:latest
 
-    root@bca08b91ff63:/mediapipe# bash ./setup_android_sdk_and_ndk.sh
+    root@bca08b91ff63:/mediapipe# bash ./setup_android_sdk_and_ndk
 
     # Should print:
     # Android NDK is now installed. Consider setting $ANDROID_NDK_HOME environment variable to be /root/Android/Sdk/ndk-bundle/android-ndk-r18b

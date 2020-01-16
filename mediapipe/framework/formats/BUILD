@@ -13,6 +13,10 @@
 # limitations under the License.
 #
 
+licenses(["notice"])  # Apache 2.0
+
+exports_files(["LICENSE"])
+
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_cc_proto_library")
 
 package(
@@ -20,59 +24,47 @@ package(
     features = ["-layering_check"],
 )
 
-licenses(["notice"])  # Apache 2.0
-
-exports_files(["LICENSE"])
-
 proto_library(
     name = "detection_proto",
     srcs = ["detection.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
     deps = ["//mediapipe/framework/formats:location_data_proto"],
 )
 
 proto_library(
     name = "classification_proto",
     srcs = ["classification.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 proto_library(
     name = "image_format_proto",
     srcs = ["image_format.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 proto_library(
     name = "matrix_data_proto",
     srcs = ["matrix_data.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 proto_library(
     name = "location_data_proto",
     srcs = ["location_data.proto"],
-    visibility = ["//visibility:public"],
     deps = ["//mediapipe/framework/formats/annotation:rasterization_proto"],
 )
 
 proto_library(
     name = "time_series_header_proto",
     srcs = ["time_series_header.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 mediapipe_cc_proto_library(
     name = "detection_cc_proto",
     srcs = ["detection.proto"],
     cc_deps = [":location_data_cc_proto"],
-    visibility = ["//visibility:public"],
-    deps = [":detection_proto"],
-)
-
-java_lite_proto_library(
-    name = "detection_java_proto_lite",
-    strict_deps = 0,
     visibility = ["//mediapipe:__subpackages__"],
     deps = [":detection_proto"],
 )
@@ -80,21 +72,27 @@ java_lite_proto_library(
 mediapipe_cc_proto_library(
     name = "classification_cc_proto",
     srcs = ["classification.proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
     deps = [":classification_proto"],
 )
 
 mediapipe_cc_proto_library(
     name = "image_format_cc_proto",
     srcs = ["image_format.proto"],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//mediapipe:__subpackages__",
+        "//mediapipe/java/com/google/mediapipe/framework:__subpackages__",
+    ],
     deps = [":image_format_proto"],
 )
 
 mediapipe_cc_proto_library(
     name = "matrix_data_cc_proto",
     srcs = ["matrix_data.proto"],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//mediapipe:__subpackages__",
+        "//mediapipe/java/com/google/mediapipe/framework:__subpackages__",
+    ],
     deps = [":matrix_data_proto"],
 )
 
@@ -102,14 +100,17 @@ mediapipe_cc_proto_library(
     name = "location_data_cc_proto",
     srcs = ["location_data.proto"],
     cc_deps = ["//mediapipe/framework/formats/annotation:rasterization_cc_proto"],
-    visibility = ["//visibility:public"],
+    visibility = ["//mediapipe:__subpackages__"],
     deps = [":location_data_proto"],
 )
 
 mediapipe_cc_proto_library(
     name = "time_series_header_cc_proto",
     srcs = ["time_series_header.proto"],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//mediapipe:__subpackages__",
+        "//mediapipe/java/com/google/mediapipe/framework:__subpackages__",
+    ],
     deps = [":time_series_header_proto"],
 )
 
@@ -248,56 +249,27 @@ cc_test(
 proto_library(
     name = "rect_proto",
     srcs = ["rect.proto"],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 mediapipe_cc_proto_library(
     name = "rect_cc_proto",
     srcs = ["rect.proto"],
     visibility = [
-        "//visibility:public",
-    ],
-    deps = [":rect_proto"],
-)
-
-java_lite_proto_library(
-    name = "rect_java_proto_lite",
-    strict_deps = 0,
-    visibility = [
         "//mediapipe:__subpackages__",
     ],
-    deps = [":landmark_proto"],
+    deps = [":rect_proto"],
 )
 
 proto_library(
     name = "landmark_proto",
     srcs = ["landmark.proto"],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//mediapipe:__subpackages__"],
 )
 
 mediapipe_cc_proto_library(
     name = "landmark_cc_proto",
     srcs = ["landmark.proto"],
-    visibility = ["//visibility:public"],
-    deps = [":landmark_proto"],
-)
-
-java_lite_proto_library(
-    name = "landmark_java_proto_lite",
-    strict_deps = 0,
-    visibility = [
-        "//mediapipe:__subpackages__",
-    ],
-    deps = [":landmark_proto"],
-)
-
-# Expose the proto source files for building mediapipe AAR.
-filegroup(
-    name = "protos_src",
-    srcs = glob(["*.proto"]),
     visibility = ["//mediapipe:__subpackages__"],
+    deps = [":landmark_proto"],
 )
