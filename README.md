@@ -60,7 +60,7 @@ bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_cpu --calcu
 
 ## Recognize Gestures
 
-**@branch: gesture-landmark**
+**@branch: gesture**
 
 The current system can recognize 10 gestures using heuristics based on 21 landmark positions.
 
