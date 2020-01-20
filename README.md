@@ -14,6 +14,10 @@ Here is the official [README](./official-readme.md) file provided by Google.
 
 Also, check out the official docs folder where additional documents are provided. Among them, I find [how_to_questions.md](./mediapipe/docs/how_to_questions.md) particularly helpful.
 
+[//]: # "Image References"
+
+[landmarks]: ./readme/landmarks.jpg "landmarks"
+
 ## Hand Tracking on Desktop with CPU
 
 **@branch: master**
@@ -58,9 +62,19 @@ bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_cpu --calcu
 
 **@branch: gesture-landmark**
 
+The current system can recognize 10 gestures using heuristics based on 21 landmark positions.
+
+`ONE`, `TWO`, `THREE`, `FOUR`, `FIVE`, `SIX`, `YEAH`, `ROCK`, `SPIDERMAN`, and `OK`.
+
+![alt text][landmarks]
+
+It detects the state (open/closed) of each finger and match the states to preset gestures. In the official blog [post](https://ai.googleblog.com/2019/08/on-device-real-time-hand-tracking-with.html), it seems that the developers at Google is also using heuristics for gesture recognition, but presumably in a more sophisticated way.
+
+> We apply a simple algorithm to derive the gestures. First, the state of each finger, e.g. bent or straight, is determined by the accumulated angles of joints. Then we map the set of finger states to a set of pre-defined gestures.
+
 ### Note
 
-Tested on Mediapipe v0.6.8 only
+Tested on Mediapipe v0.6.8 only.
 
 The building & running methods are identical to the standard methods as in [Hand Tracking on Desktop with CPU](#hand-tracking-on-desktop-with-cpu) because the dependant calculators are modified directly.
 
