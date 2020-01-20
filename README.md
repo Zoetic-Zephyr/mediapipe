@@ -2,9 +2,9 @@
 
 This repository provides the Hand Skeleton Tracking (pose estimation) functionality and additionally two applications that derive from it.
 
-1. [Hand Skeleton Tracking (core functionality)](#hand-tracking-on-desktop-with-cpu) 			@ branch:master
-2. [Joint Landmark Output](#output-landmarks)							 	   			@branch: out-landmark
-3. [Gesture Recognition](#recognize-gestures)													 @branch: gesture
+1. [Hand Skeleton Tracking (core functionality)](#hand-tracking-on-desktop-with-cpu) @ branch:master
+2. [Joint Landmark Output](#output-landmarks) @branch: out-landmark
+3. [Gesture Recognition](#recognize-gestures) @branch: gesture
 
 To use this repo, simply `clone` it to your local machine, `cd` to the root folder, and execute in your `cmd` tool the corresponding commands provided in the **To build** section in order to start the compliation process. When finished, execute the commands in the **To run** section accordingly.
 
