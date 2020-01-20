@@ -3,6 +3,8 @@
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/formats/rect.pb.h"
 
+#include <iomanip>
+
 namespace mediapipe
 {
 
@@ -118,7 +120,12 @@ REGISTER_CALCULATOR(HandGestureRecognitionCalculator);
     {
         fourthFingerIsOpen = true;
     }
-
+    
+    // Print out landmarks for the five finger tips
+    // landmarkList.landmark(4/8/12/16/20).x/y()
+    std::cout << "pos of the index finger:" << std::endl;
+    std::cout << std::fixed << std::setprecision(3) << landmarkList.landmark(8).x() << "  |  " << landmarkList.landmark(8).y() << std::endl;
+    
     // Hand gesture recognition
     if (thumbIsOpen && firstFingerIsOpen && secondFingerIsOpen && thirdFingerIsOpen && fourthFingerIsOpen)
     {
